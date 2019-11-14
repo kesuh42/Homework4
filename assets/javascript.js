@@ -1,6 +1,7 @@
 var testEl = document.getElementById("begintest")
 var timerEl = document.getElementById("timer")
 var feedbackEl = document.getElementById("feedback")
+var beginButton = document.getElementById("begin")
 var time = 75
 var questionNumber = 0
 
@@ -107,6 +108,10 @@ var questionArray = [
     },
   ];
 
+beginButton.addEventListener("click", function() {
+    render(questionNumber)
+})
+
 //Running the timer and updating the timer text
 var interval = setInterval(function() {
     //Time's up!
@@ -142,6 +147,7 @@ function render(x) {
 }
 
 function endTest() {
+    //When time is up or the last question is answered
     clearInterval(interval)
     testEl.textContent = "Your final score is: " + time
     var highscoresButton = document.createElement("button")
@@ -153,15 +159,12 @@ function endTest() {
     feedbackEl.textContent = ""
 }
 
-render(questionNumber)
-
 //Button event listeners
 testEl.addEventListener("click", function() {
     var clickedAnswer = event.target.textContent
-    var answersArray = questionArray[questionNumber].choices
     var correctAnswer = questionArray[questionNumber].answer
 
-    if (event.target = "button") {
+    if (event.target = "button" && event.target.textContent != "Begin!") {
         if (clickedAnswer === correctAnswer) {
             feedbackEl.textContent = "Correct!"
         }
