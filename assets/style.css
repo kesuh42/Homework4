@@ -1,0 +1,20 @@
+#highscores {
+    width: 50%;
+    float: left;
+}
+
+#timer {
+    text-align: right;
+    width: 50%;
+    float: right;
+}
+
+#feedback {
+    text-align: center;
+}
+
+#begintest {
+    width: 50%;
+    margin: auto;
+    text-align: center;
+}
