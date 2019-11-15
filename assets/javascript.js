@@ -11,6 +11,7 @@ if (localStorage.getItem("highscores") !== undefined) {
     highScoresArray = JSON.parse(localStorage.getItem("highscores"))
 }
 
+//An array of cool questions
 var questionArray = [
     {
         title: "Name the functional group common to all alcohols.",
@@ -114,13 +115,19 @@ var questionArray = [
     },
   ];
 
+//Link to the high scores
+highScoresLink.addEventListener("click", function() {
+    renderScores();
+})
+
 //Running the timer and updating the timer text
 function beginTimer() {
     var interval = setInterval(function() {
-        //Time's up!
+        //If all questions are finished
         if (questionNumber === questionArray.length) {
             clearInterval(interval)
         }
+        //If time runs out
         if (time === 0) {
             timerEl.textContent = "Time: " + time
             clearInterval(interval)
@@ -133,8 +140,15 @@ function beginTimer() {
             timerEl.textContent = "Time: " + time
         }
     }, 1000)
+    ///Timer needs to stop with highscoreslink
+    highScoresLink.addEventListener("click", function() {
+        clearInterval(interval);
+        time = 0
+        timerEl.textContent = "Time: " + time
+    })
 }
 
+//Renders the test
 function render(x) {
     //Clear the test space
     testEl.innerHTML = ""
@@ -181,18 +195,20 @@ function endTest() {
 testEl.addEventListener("click", function() {
 
     if (event.target.tagName === "BUTTON") {
-        //Starts the quiz
+        //Begin Button
         if (event.target.textContent === "Begin!" || event.target.textContent === "Take the quiz again!") {
             questionNumber = 0
             time = 75
             beginTimer()
             render(questionNumber)
         }
+        //Clear button
         else if (event.target.textContent === "Clear highscores") {
             highScoresArray = []
             localStorage.setItem("highscores", JSON.stringify(highScoresArray))
             renderScores()
         }
+        //Answer buttons
         else {
             var clickedAnswer = event.target.textContent
             var correctAnswer = questionArray[questionNumber].answer        
@@ -223,15 +239,17 @@ testEl.addEventListener("click", function() {
     }
 })
 
-
+//Render the High Scores page
 function renderScores() {
     testEl.textContent = ""
+    //List of High Scores
     highScoresArray = JSON.parse(localStorage.getItem("highscores"))
     for (i of highScoresArray) {
         var newScore = document.createElement("div")
         newScore.textContent = i.initials + ":   " + i.score
         testEl.appendChild(newScore)
     }
+
     var returnButton = document.createElement("button")
     returnButton.textContent = "Take the quiz again!"
     testEl.appendChild(returnButton)
@@ -241,6 +259,7 @@ function renderScores() {
     testEl.appendChild(clearButton)
 }
 
+//Submitting scores at the end of a test
 testEl.addEventListener("submit", function() {
     highScoresArray.push({initials: document.querySelector("input").value, score: finalScore})
     localStorage.setItem("highscores", JSON.stringify(highScoresArray))
