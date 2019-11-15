@@ -9,6 +9,11 @@
     float: right;
 }
 
+#title {
+    font-size: 40px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 #feedback {
     text-align: center;
 }

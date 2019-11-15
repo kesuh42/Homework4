@@ -2,8 +2,14 @@ var testEl = document.getElementById("begintest")
 var timerEl = document.getElementById("timer")
 var feedbackEl = document.getElementById("feedback")
 var beginButton = document.getElementById("begin")
+var highScoresLink = document.getElementById("highscores")
 var time = 75
 var questionNumber = 0
+var finalScore = 0
+var highScoresArray = []
+if (localStorage.getItem("highscores") !== undefined) {
+    highScoresArray = JSON.parse(localStorage.getItem("highscores"))
+}
 
 var questionArray = [
     {
@@ -108,24 +114,26 @@ var questionArray = [
     },
   ];
 
-beginButton.addEventListener("click", function() {
-    render(questionNumber)
-})
-
 //Running the timer and updating the timer text
-var interval = setInterval(function() {
-    //Time's up!
-    if (time === 0) {
-        timerEl.textContent = "Time: " + time
-        clearInterval(interval)
-        alert("Time's up!")
-        endTest()
-    }
-    else {
-    time--
-    timerEl.textContent = "Time: " + time
-    }
-}, 1000)
+function beginTimer() {
+    var interval = setInterval(function() {
+        //Time's up!
+        if (questionNumber === questionArray.length) {
+            clearInterval(interval)
+        }
+        if (time === 0) {
+            timerEl.textContent = "Time: " + time
+            clearInterval(interval)
+            alert("Time's up!")
+            endTest()
+        }
+        //Decrement time and update timer
+        else {
+            time--
+            timerEl.textContent = "Time: " + time
+        }
+    }, 1000)
+}
 
 function render(x) {
     //Clear the test space
@@ -148,45 +156,93 @@ function render(x) {
 
 function endTest() {
     //When time is up or the last question is answered
-    clearInterval(interval)
-    testEl.textContent = "Your final score is: " + time
-    var highscoresButton = document.createElement("button")
+    finalScore = time
+    timerEl.textContent = time
+    testEl.textContent = "Your final score is: " + finalScore
+
     var space = document.createElement("br")
     testEl.appendChild(space)
-    highscoresButton.textContent =  "Highscores"
-    highscoresButton.setAttribute("onclick", "window.location.href='highscores.html'")
-    testEl.appendChild(highscoresButton)
+
+    var form = document.createElement("form")
+    form.textContent = "Please enter your initials"
+    testEl.appendChild(form)
+
+    var initials = document.createElement("input")
+    form.appendChild(initials)
+    
+    var submit = document.createElement("input")
+    submit.setAttribute("type", "submit")
+    form.appendChild(submit)
+
     feedbackEl.textContent = ""
 }
 
 //Button event listeners
 testEl.addEventListener("click", function() {
-    var clickedAnswer = event.target.textContent
-    var correctAnswer = questionArray[questionNumber].answer
 
-    if (event.target = "button" && event.target.textContent != "Begin!") {
-        if (clickedAnswer === correctAnswer) {
-            feedbackEl.textContent = "Correct!"
+    if (event.target.tagName === "BUTTON") {
+        //Starts the quiz
+        if (event.target.textContent === "Begin!" || event.target.textContent === "Take the quiz again!") {
+            questionNumber = 0
+            time = 75
+            beginTimer()
+            render(questionNumber)
+        }
+        else if (event.target.textContent === "Clear highscores") {
+            highScoresArray = []
+            localStorage.setItem("highscores", JSON.stringify(highScoresArray))
+            renderScores()
         }
         else {
-            feedbackEl.textContent = "Wrong!"
-            //Deducting time for a wrong answer
-            if (time > 15) {
-                time = time - 15
-                timerEl.textContent = "Time: " + time
+            var clickedAnswer = event.target.textContent
+            var correctAnswer = questionArray[questionNumber].answer        
+            if (clickedAnswer === correctAnswer) {
+                feedbackEl.textContent = "Correct!"
             }
             else {
-                time = 0
-                timerEl.textContent = "Time: " + time
+                feedbackEl.textContent = "Wrong!"
+                //Deducting time for a wrong answer
+                if (time > 15) {
+                    time = time - 15
+                    timerEl.textContent = "Time: " + time
+                }
+                else {
+                    time = 0
+                    timerEl.textContent = "Time: " + time
+                }
+            }
+            //Increment questionNumber to render next question
+            questionNumber++
+            if (questionNumber === questionArray.length) {
+                endTest()
+            }
+            else {
+            render(questionNumber)
             }
         }
-        //Increment questionNumber to render next question
-        questionNumber++
-        if (questionNumber === questionArray.length) {
-            endTest()
-        }
-        else {
-        render(questionNumber)
-        }
     }
+})
+
+
+function renderScores() {
+    testEl.textContent = ""
+    highScoresArray = JSON.parse(localStorage.getItem("highscores"))
+    for (i of highScoresArray) {
+        var newScore = document.createElement("div")
+        newScore.textContent = i.initials + ":   " + i.score
+        testEl.appendChild(newScore)
+    }
+    var returnButton = document.createElement("button")
+    returnButton.textContent = "Take the quiz again!"
+    testEl.appendChild(returnButton)
+
+    var clearButton = document.createElement("button")
+    clearButton.textContent = "Clear highscores"
+    testEl.appendChild(clearButton)
+}
+
+testEl.addEventListener("submit", function() {
+    highScoresArray.push({initials: document.querySelector("input").value, score: finalScore})
+    localStorage.setItem("highscores", JSON.stringify(highScoresArray))
+    renderScores()
 })
