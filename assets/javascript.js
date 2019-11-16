@@ -7,7 +7,7 @@ var time = 120
 var questionNumber = 0
 var finalScore = 0
 var highScoresArray = []
-if (localStorage.getItem("highscores") !== undefined) {
+if (localStorage.getItem("highscores") !== null) {
     highScoresArray = JSON.parse(localStorage.getItem("highscores"))
 }
 
