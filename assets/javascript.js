@@ -186,8 +186,8 @@ function endTest() {
     var initials = document.createElement("input");
     form.appendChild(initials);
     
-    var submit = document.createElement("input");
-    submit.setAttribute("type", "submit");
+    var submit = document.createElement("button");
+    submit.textContent = "Submit";
     form.appendChild(submit);
 
     feedbackEl.textContent = "";
@@ -216,6 +216,13 @@ testEl.addEventListener("click", function() {
             renderHome();
         }
 
+        //Submitting scores at the end of a test
+        else if (event.target.textContent === "Submit") {
+            highScoresArray.push({initials: document.querySelector("input").value, score: finalScore});
+            localStorage.setItem("highscores", JSON.stringify(highScoresArray));
+            renderScores();
+        }
+
         //Answer buttons
         else {
             var clickedAnswer = event.target.textContent;
@@ -237,7 +244,7 @@ testEl.addEventListener("click", function() {
                     timerEl.textContent = "Time: " + time;
                 }
             }
-            //Increment questionNumber to render next question
+            //Increment questionNumber and render next question
             questionNumber++
             if (questionNumber === questionArray.length) {
                 endTest();
@@ -297,9 +304,4 @@ function renderHome() {
     testEl.appendChild(beginButton);
 }
 
-//Submitting scores at the end of a test
-testEl.addEventListener("submit", function() {
-    highScoresArray.push({initials: document.querySelector("input").value, score: finalScore});
-    localStorage.setItem("highscores", JSON.stringify(highScoresArray));
-    renderScores();
-})
+
