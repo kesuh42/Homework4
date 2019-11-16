@@ -3,7 +3,7 @@ var timerEl = document.getElementById("timer")
 var feedbackEl = document.getElementById("feedback")
 var beginButton = document.getElementById("begin")
 var highScoresLink = document.getElementById("highscores")
-var time = 75
+var time = 120
 var questionNumber = 0
 var finalScore = 0
 var highScoresArray = []
@@ -125,70 +125,72 @@ function beginTimer() {
     var interval = setInterval(function() {
         //If all questions are finished
         if (questionNumber === questionArray.length) {
-            clearInterval(interval)
+            clearInterval(interval);
         }
         //If time runs out
         if (time === 0) {
-            timerEl.textContent = "Time: " + time
-            clearInterval(interval)
-            alert("Time's up!")
-            endTest()
+            timerEl.textContent = "Time: " + time;
+            clearInterval(interval);
+            alert("Time's up!");
+            endTest();
         }
         //Decrement time and update timer
         else {
-            time--
-            timerEl.textContent = "Time: " + time
+            time--;
+            timerEl.textContent = "Time: " + time;
         }
     }, 1000)
     ///Timer needs to stop with highscoreslink
     highScoresLink.addEventListener("click", function() {
         clearInterval(interval);
-        time = 0
-        timerEl.textContent = "Time: " + time
+        time = 0;
+        timerEl.textContent = "Time: " + time;
     })
 }
 
 //Renders the test
 function render(x) {
     //Clear the test space
-    testEl.innerHTML = ""
+    testEl.innerHTML = "";
     //Create question
-    var question = document.createElement("div")
-    question.textContent = (questionArray[x].title)
-    testEl.appendChild(question)
+    var question = document.createElement("div");
+    question.textContent = (questionArray[x].title);
+    testEl.appendChild(question);
     //Create answer buttons
     var answersArray = questionArray[x].choices
     for (i of answersArray) {
-        var answerButton = document.createElement("button")
-        answerButton.textContent = i
-        testEl.appendChild(answerButton)
-        var space = document.createElement("br")
-        testEl.appendChild(space)
+        var answerButton = document.createElement("button");
+        answerButton.textContent = i;
+        answerButton.setAttribute("class", "btn btn-primary");
+        testEl.appendChild(answerButton);
+        var space = document.createElement("br");
+        testEl.appendChild(space);
     }
 
 }
 
+//Test ends, user submits score
 function endTest() {
     //When time is up or the last question is answered
-    finalScore = time
-    timerEl.textContent = time
-    testEl.textContent = "Your final score is: " + finalScore
+    finalScore = time;
+    timerEl.textContent = "Time: " + time;
+    testEl.textContent = "Your final score is: " + finalScore;
 
-    var space = document.createElement("br")
-    testEl.appendChild(space)
+    var space = document.createElement("br");
+    testEl.appendChild(space);
 
-    var form = document.createElement("form")
-    form.textContent = "Please enter your initials"
-    testEl.appendChild(form)
+    var form = document.createElement("form");
+    form.textContent = "Please enter your initials";
+    testEl.appendChild(form);
 
-    var initials = document.createElement("input")
-    form.appendChild(initials)
+    var initials = document.createElement("input");
+    form.appendChild(initials);
     
-    var submit = document.createElement("input")
-    submit.setAttribute("type", "submit")
-    form.appendChild(submit)
+    var submit = document.createElement("input");
+    submit.setAttribute("type", "submit");
+    form.appendChild(submit);
 
-    feedbackEl.textContent = ""
+    feedbackEl.textContent = "";
 }
 
 //Button event listeners
@@ -197,43 +199,51 @@ testEl.addEventListener("click", function() {
     if (event.target.tagName === "BUTTON") {
         //Begin Button
         if (event.target.textContent === "Begin!" || event.target.textContent === "Take the quiz again!") {
-            questionNumber = 0
-            time = 75
-            beginTimer()
-            render(questionNumber)
+            questionNumber = 0;
+            time = 120;
+            beginTimer();
+            render(questionNumber);
         }
         //Clear button
         else if (event.target.textContent === "Clear highscores") {
-            highScoresArray = []
-            localStorage.setItem("highscores", JSON.stringify(highScoresArray))
-            renderScores()
+            highScoresArray = [];
+            localStorage.setItem("highscores", JSON.stringify(highScoresArray));
+            renderScores();
         }
+
+        //Home Button
+        else if (event.target.textContent === "Main page") {
+            renderHome();
+        }
+
         //Answer buttons
         else {
-            var clickedAnswer = event.target.textContent
-            var correctAnswer = questionArray[questionNumber].answer        
+            var clickedAnswer = event.target.textContent;
+            var correctAnswer = questionArray[questionNumber].answer   ;     
             if (clickedAnswer === correctAnswer) {
-                feedbackEl.textContent = "Correct!"
+                feedbackEl.textContent = "Correct!";
+                feedbackEl.setAttribute("style", "color: green");
             }
             else {
-                feedbackEl.textContent = "Wrong!"
+                feedbackEl.textContent = "Wrong!";
+                feedbackEl.setAttribute("style", "color: red");
                 //Deducting time for a wrong answer
                 if (time > 15) {
-                    time = time - 15
-                    timerEl.textContent = "Time: " + time
+                    time = time - 15;
+                    timerEl.textContent = "Time: " + time;
                 }
                 else {
-                    time = 0
-                    timerEl.textContent = "Time: " + time
+                    time = 0;
+                    timerEl.textContent = "Time: " + time;
                 }
             }
             //Increment questionNumber to render next question
             questionNumber++
             if (questionNumber === questionArray.length) {
-                endTest()
+                endTest();
             }
             else {
-            render(questionNumber)
+            render(questionNumber);
             }
         }
     }
@@ -241,27 +251,55 @@ testEl.addEventListener("click", function() {
 
 //Render the High Scores page
 function renderScores() {
-    testEl.textContent = ""
+    testEl.textContent = "";
+    feedbackEl.textContent = "";
+
     //List of High Scores
-    highScoresArray = JSON.parse(localStorage.getItem("highscores"))
+    highScoresArray = JSON.parse(localStorage.getItem("highscores"));
     for (i of highScoresArray) {
-        var newScore = document.createElement("div")
-        newScore.textContent = i.initials + ":   " + i.score
-        testEl.appendChild(newScore)
+        var newScore = document.createElement("div");
+        newScore.textContent = i.initials + ":   " + i.score;
+        testEl.appendChild(newScore);
     }
 
-    var returnButton = document.createElement("button")
-    returnButton.textContent = "Take the quiz again!"
-    testEl.appendChild(returnButton)
+    var returnButton = document.createElement("button");
+    returnButton.textContent = "Take the quiz again!";
+    returnButton.setAttribute("class", "btn btn-primary");
+    testEl.appendChild(returnButton);
 
-    var clearButton = document.createElement("button")
-    clearButton.textContent = "Clear highscores"
-    testEl.appendChild(clearButton)
+    var clearButton = document.createElement("button");
+    clearButton.textContent = "Clear highscores";
+    clearButton.setAttribute("class", "btn btn-primary");
+    testEl.appendChild(clearButton);
+
+    var homeButton = document.createElement("button");
+    homeButton.textContent = "Main page";
+    homeButton.setAttribute("class", "btn btn-primary");
+    testEl.appendChild(homeButton);
+}
+
+//Return to main page from high scores
+function renderHome() {
+    testEl.textContent = "";
+    var testTitle = document.createElement("div");
+    testTitle.textContent = "Kevin's Impossible Quiz of Random Knowledge";
+    testTitle.setAttribute("id", "title");
+    testEl.appendChild(testTitle);
+
+    var beginText = document.createElement("p");
+    beginText.textContent = "Press the button to begin!";
+    testEl.appendChild(beginText);
+
+    var beginButton = document.createElement("button");
+    beginButton.textContent = "Begin!";
+    beginButton.setAttribute("class", "btn btn-primary");
+    beginButton.setAttribute("id", "button");
+    testEl.appendChild(beginButton);
 }
 
 //Submitting scores at the end of a test
 testEl.addEventListener("submit", function() {
-    highScoresArray.push({initials: document.querySelector("input").value, score: finalScore})
-    localStorage.setItem("highscores", JSON.stringify(highScoresArray))
-    renderScores()
+    highScoresArray.push({initials: document.querySelector("input").value, score: finalScore});
+    localStorage.setItem("highscores", JSON.stringify(highScoresArray));
+    renderScores();
 })
